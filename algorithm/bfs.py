@@ -26,7 +26,6 @@ class BFS:
     def _get_point(point_name, key_lst):
         return choice(list(key_lst))
 
-
     def run_bfs(self):
         self.queue.put(self.start)
         self.visited.append(self.start)

@@ -24,9 +24,8 @@ class BFS:
 
     @staticmethod
     def _get_point(point_name, key_lst):
-        if not point_name:
-            return choice(list(key_lst))
-        return point_name.upper()
+        return choice(list(key_lst))
+
 
     def run_bfs(self):
         self.queue.put(self.start)

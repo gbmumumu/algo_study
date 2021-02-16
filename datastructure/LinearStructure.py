@@ -153,6 +153,51 @@ def calc_sfx_expr(token: str):
 print(calc_sfx_expr('4 5 6 * +'))
 
 
+# 队列
+# 新数据项的添加总发生在一端（通常称为尾端 rear）移除在另一端（通常称为 front）
+# First in first out (FIFO)
+# 仅有一个入口和出口
+# 有次序的数据集合
+# enqueue, dequeue, is_empty, size
+
+class Queue:
+    def __init__(self):
+        self.items = []
+
+    def size(self):
+        return len(self.items)
+
+    def is_empty(self):
+        return self.items == []
+
+    def enqueue(self, item):
+        self.items.insert(0, item)
+        # self.items.append(item)
+
+    def dequeue(self):
+        return self.items.pop()
+        # return self.items.pop(0)
+
+
+# app
+# 热土豆
+def deliver_potato(name_lst, num):
+    sim_queue = Queue()
+    for name in name_lst:
+        sim_queue.enqueue(name)
+
+    while sim_queue.size() > 1:
+        for _ in range(num):
+            sim_queue.enqueue(sim_queue.dequeue())
+        sim_queue.dequeue()
+
+    return sim_queue.dequeue()
+
+
+print(deliver_potato(['Bill', 'David', 'Susan', 'Jane', 'Kent', 'Brad'], 7))
+
+# app
+# 打印任务
 
 if __name__ == "__main__":
     pass

@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- encoding: utf-8 -*-
 
+import random
+
+
 # 线性结构是一种有序数据项的集合，其中每个数据项都有唯一的前驱与后继
 # "左、右"/端 "前， 后"/端 "顶，底"/端
 # 不同的线性结构的关键区别在于数据项的增减的方式
@@ -196,8 +199,77 @@ def deliver_potato(name_lst, num):
 
 print(deliver_potato(['Bill', 'David', 'Susan', 'Jane', 'Kent', 'Brad'], 7))
 
+
 # app
 # 打印任务
+# 按照概率生成打印作业，加入打印队列
+# 如果打印机空闲且队列不为空，则取出队首作业打印，记录此作业的打印时间
+# 如果打印机忙，则按照打印速度进行1秒打印
+# 如果当前作业打印完成，则打印机进入空闲
+
+class PrintMachine:
+    def __init__(self, ppm):
+        self.page_rate = ppm  # 打印速度
+        self.current_task = None  # 打印任务
+        self.time_remaining = 0  # 任务倒计时
+
+    def tick(self):
+        if self.current_task is not None:
+            self.time_remaining -= 1
+            if self.time_remaining <= 0:
+                self.current_task = None
+
+    def is_busy(self):
+        return self.current_task is not None
+
+    def start_next(self, new_task):
+        self.current_task = new_task
+        self.time_remaining = new_task.get_pages() * 60 / self.page_rate
+
+
+class Task:
+    def __init__(self, time):
+        self.time_stamp = time
+        self.pages = random.randint(1, 21)
+
+    def get_stamp(self):
+        return self.time_stamp
+
+    def get_pages(self):
+        return self.pages
+
+    def wait_time(self, current_time):
+        return current_time - self.time_stamp
+
+    @staticmethod
+    def new_print_task():
+        num = random.randrange(1, 181)
+        return num == 180
+
+
+def simulation(num_seconds, pages_per_minute):
+    lab_printer = PrintMachine(pages_per_minute)
+    print_queue = Queue()
+    waiting_time = []
+
+    for current_second in range(num_seconds):
+        if Task.new_print_task():
+            task = Task(current_second)
+            print_queue.enqueue(task)
+
+        if not lab_printer.is_busy() and not print_queue.is_empty():
+            next_task = print_queue.dequeue()
+            waiting_time.append(current_second)
+            lab_printer.start_next(next_task)
+        lab_printer.tick()
+
+    average_wait_time = sum(waiting_time) / len(waiting_time)
+    print("Average wait %6.2f secs %3d tasks remaining" \
+          % (average_wait_time, print_queue.size()))
+
+
+for _ in range(10):
+    simulation(3600, 5)
 
 if __name__ == "__main__":
     pass

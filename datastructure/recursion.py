@@ -165,13 +165,13 @@ def search(maze, start_row, start_col):
 
 print(search(maze_2, 1, 1))
 
-
 # 递归算法与分治策略
 # 找零
 # 贪心策略
 # 每次都试图解决问题最大的一部分
 # 以最多数量的最大面值硬币来迅速减少找零面值
 # 然而贪心算法依赖于面值，在某些特殊的面值下会失效
+"""
 
 def get_coin(cvl, change):  # 极其低效！
     min_coins = change
@@ -187,6 +187,7 @@ def get_coin(cvl, change):  # 极其低效！
 
 
 print(get_coin([1, 5, 10, 25], 63))
+"""
 
 
 # 递归方法改进
@@ -209,7 +210,39 @@ def get_coin_faster(cvl, change, known_res):  # 记忆化/函数值缓存
 
 print(get_coin_faster([1, 5, 10, 25], 63, [0] * 64))
 
+
 # dp, 动态规划
+# 更有条理
+# 设法保持每一分钱的递加都是最优解
+def make_change(cvl, change, min_coins):
+    global coin_used
+    for cents in range(1, change + 1):
+        coin_count = cents
+        new_coin = 1
+        for j in [c for c in cvl if c <= cents]:
+            if min_coins[cents - j] + 1 < coin_count:
+                coin_count = min_coins[cents - j] + 1
+                new_coin = j
+        min_coins[cents] = coin_count
+        coin_used[cents] = new_coin
+    return min_coins[change]
+
+
+def print_coins(change):
+    global coin_used
+    coin = change
+    while coin > 0:
+        this_coin = coin_used[coin]
+        print(this_coin)
+        coin -= this_coin
+
+
+coin_used = [0] * 64
+print(make_change([1, 5, 10, 21, 25], 63, [0] * 64))
+print_coins(63)
+print(coin_used)
+
+# 背包问题
 
 
 if __name__ == "__main__":

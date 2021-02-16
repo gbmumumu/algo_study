@@ -322,5 +322,143 @@ def pal_checker(string):
 print(pal_checker('madam'))
 print(pal_checker('earth'))
 
+
+# unsorted list
+# 无序表
+# add, remove, search, is_empty, size, append, index, insert, pop
+# 采用链表实现无序表
+
+class Node:
+    def __init__(self, init_dat):
+        self.dat = init_dat
+        self.next = None
+
+    def get_dat(self):
+        return self.dat
+
+    def get_next(self):
+        return self.next
+
+    def set_dat(self, new_dat):
+        self.dat = new_dat
+
+    def set_next(self, new_next):
+        self.next = new_next
+
+
+class UnsortedList:
+    def __init__(self):
+        self.head = None
+
+    def is_empty(self):
+        return self.head is None
+
+    def add(self, item):
+        tmp = Node(item)
+        tmp.set_next(self.head)
+        self.head = tmp
+
+    def size(self):
+        cur = self.head
+        count = 0
+        while cur is not None:
+            count += 1
+            cur = cur.next
+
+        return count
+
+    def search(self, item):
+        cur = self.head
+        found = False
+        while cur is not None and not found:
+            if cur.get_dat() == item:
+                found = True
+            else:
+                cur = cur.next
+
+        return found
+
+    def remove(self, item):
+        cur = self.head
+        previous = None
+        found = False
+        while not found:
+            if cur.get_dat() == item:
+                found = True
+            else:
+                previous = cur
+                cur = cur.next
+        if previous is None:
+            self.head = cur.next
+        else:
+            previous.set_next(cur.next)
+
+    def append(self, item):
+        tmp = Node(item)
+        cur = self.head
+        while cur is not None:
+            cur = cur.next
+        cur.set_next(tmp)
+
+    def pop(self, index):
+        pass
+
+
+# 有序表
+# OrderedList
+# 以链表形式
+# is_empty, size, remove
+
+class OrderedList:
+    def __init__(self):
+        self.head = None
+
+    def search(self, item):
+        cur = self.head
+        found = False
+        stop = False
+
+        while cur is not None and not found and not stop:
+            if cur.get_dat() == item:
+                found = True
+            else:
+                if cur.get_dat() > item:
+                    stop = True
+                else:
+                    cur = cur.next
+
+        return found
+
+    def add(self, item):
+        cur = self.head
+        previous = None
+        stop = False
+        while cur is not None and not stop:
+            if cur.get_dat() > item:
+                stop = True
+            else:
+                previous = cur
+                cur = cur.next
+        tmp = Node(item)
+        if previous is None:
+            tmp.set_next(self.head)
+            self.head = tmp
+        else:
+            tmp.set_next(cur)
+            previous.set_next(tmp)
+
+    def is_empty(self):
+        return self.head is None
+
+    def size(self):
+        cur = self.head
+        count = 0
+        while cur is not None:
+            count += 1
+            cur = cur.next
+
+        return count
+
+
 if __name__ == "__main__":
     pass

@@ -271,5 +271,56 @@ def simulation(num_seconds, pages_per_minute):
 for _ in range(10):
     simulation(3600, 5)
 
+
+# 双端队列 deque
+# 继承了栈和队列的能力
+# 不具有LIFO/LIFO
+# 需要使用着自己来自行为何操作的一致性
+# add_front, add_rear, remove_front, remove_rear
+
+class Deque:
+    def __init__(self):
+        self.items = []
+
+    def is_empty(self):
+        return self.items == []
+
+    def size(self):
+        return len(self.items)
+
+    def add_rear(self, item):
+        self.items.insert(0, item)
+
+    def rm_rear(self):
+        return self.items.pop(0)
+
+    def add_front(self, item):
+        self.items.append(item)
+
+    def rm_front(self):
+        return self.items.pop()
+
+
+# 回文词的判定
+# "radar", "madam", "toot"
+
+def pal_checker(string):
+    char_deque = Deque()
+    for char in string:
+        char_deque.add_rear(char)
+
+    still_equal = True
+    while char_deque.size() > 1 and still_equal:
+        first = char_deque.rm_front()
+        last = char_deque.rm_rear()
+        if first != last:
+            still_equal = False
+
+    return still_equal
+
+
+print(pal_checker('madam'))
+print(pal_checker('earth'))
+
 if __name__ == "__main__":
     pass

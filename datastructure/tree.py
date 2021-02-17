@@ -183,5 +183,110 @@ results = evaluate(expr_tree)
 print(my_expr)
 print(results)
 
+
+# 树的遍历
+# 前序遍历
+# ->根 ->左 ->右
+# 中序遍历
+# ->左 ->根 ->右
+# 后序遍历
+# ->左 ->右 ->根
+
+def per_order(tree: BinaryTree):  # 前序遍历
+    if tree:
+        print(tree.get_root_val())
+        per_order(tree.get_left_child())
+        per_order(tree.get_right_child())
+
+
+def post_order(tree: BinaryTree):  # 后序遍历
+    if tree is not None:
+        post_order(tree.get_left_child())
+        post_order(tree.get_right_child())
+        print(tree.get_root_val())
+
+
+def in_order(tree: BinaryTree):  # 中序遍历
+    if tree is not None:
+        in_order(tree.get_left_child())
+        print(tree.get_root_val())
+        in_order(tree.get_right_child())
+
+
+def print_expr(tree: BinaryTree):
+    s_val = ''
+    if tree:
+        s_val = '(' + print_expr(tree.get_left_child())
+        s_val = s_val + str(tree.get_root_val())
+        s_val = s_val + print_expr(tree.get_right_child()) + ')'
+    return s_val
+
+
+# 优先队列
+# priority queue
+# 二叉堆 O(log n)
+# 最小堆/大堆
+# ADT: BinaryHeap
+# insert, findMin, delMin, is_empty, size, buildHeap
+# 采用完全二叉树的结构近似实现"平衡"
+# 如果节点下表为p，左子节点下标为2p，右子节点下标为2p+1，父节点为p//2
+# 任何一个节点x， 其父节点p中的key均小于x中的key
+# -> 根节点k最小
+
+class BinaryHeap:
+    def __init__(self):
+        self.heap_list = [0]  # 无需进行下标的偏移值操作
+        self.cur_size = 0
+
+    def perc_up(self, i):  # 上浮
+        while i // 2 > 0:
+            if self.heap_list[i] < self.heap_list[i // 2]:
+                tmp = self.heap_list[i // 2]
+                self.heap_list[i // 2] = self.heap_list[i]
+                self.heap_list[i] = tmp
+            i //= 2
+
+    def insert(self, key):
+        self.heap_list.append(key)
+        self.cur_size += 1
+        self.perc_up(self.cur_size)
+
+    def min_child(self, i):
+        if i * 2 + 1 > self.cur_size:
+            return i * 2
+        else:
+            if self.heap_list[i * 2] < self.heap_list[i * 2 + 1]:
+                return i * 2 + 1
+
+    def perc_down(self, i):
+        while i * 2 <= self.cur_size:
+            mc = self.min_child(i)
+            if self.heap_list[i] > self.heap_list[mc]:
+                tmp = self.heap_list[i]
+                self.heap_list[i] = self.heap_list[mc]
+                self.heap_list[mc] = tmp
+            i = mc
+
+    def del_min(self):
+        ret_val = self.heap_list[1]  # 移走堆顶
+        self.heap_list[1] = self.heap_list[self.cur_size]
+        self.cur_size -= 1
+        self.heap_list.pop()
+        self.perc_down(1)  # 新顶下沉
+        return ret_val
+
+    def build_heap(self, lst):   # O(n)
+        i = len(lst) // 2
+        self.cur_size = len(lst)
+        self.heap_list = [0] + lst
+        while i > 0:
+            self.perc_down(i)
+            i -= 1
+
+# 堆排序 O(n log n)
+# pass
+# 二叉查找树
+
+
 if __name__ == "__main__":
     pass

@@ -122,5 +122,50 @@ def merge_sort(unsort_lst):
     return merged
 
 
+# 快速排序 O(n log n)
+# quick sort
+# 依据一个中值数据项来把数据表分为两半，然后对每部部分分别进行快速排序（递归）
+# 分裂 + 移动
+# 不需要和 merge sort 一样的存储空间
+def quick_sort(unsort_lst):
+    return helper(unsort_lst, 0, len(unsort_lst) - 1)
+
+
+def helper(unsort_lst, first, last):
+    if first < last:
+        split_p = partition(unsort_lst, first, last)
+        helper(unsort_lst, first, split_p - 1)
+        helper(unsort_lst, split_p + 1, last)
+
+    return unsort_lst
+
+
+def partition(unsort_lst, first, last):
+    pivot_val = unsort_lst[first]
+    left_mark = first + 1
+    right_mark = last
+    done = False
+    while not done:
+        while left_mark <= right_mark and unsort_lst[left_mark] <= pivot_val:
+            left_mark += 1
+        while unsort_lst[right_mark] >= pivot_val and right_mark >= left_mark:
+            right_mark -= 1
+        if right_mark < left_mark:
+            done = True
+        else:
+            tmp = unsort_lst[left_mark]
+            unsort_lst[left_mark] = unsort_lst[right_mark]
+            unsort_lst[right_mark] = tmp
+
+    tmp = unsort_lst[first]
+    unsort_lst[first] = unsort_lst[right_mark]
+    unsort_lst[right_mark] = tmp
+
+    return right_mark
+
+
+lst = [54, 26, 42, 93, 17, 77, 31, 44, 55, 20]
+print(quick_sort(lst))
+
 if __name__ == "__main__":
     pass

@@ -99,8 +99,27 @@ def gap_insertion_sort(unsort_lst, start, gap):
 lst = [54, 26, 42, 93, 17, 77, 31, 44, 55, 20]
 print(shell_sort(lst))
 
-# 归并排序
+
+# 归并排序 O(n log n)
 # merge_sort
+# 分治策略，递归
+# 将无序表持续地分裂为两半，对两半分别进行归并排序
+def merge_sort(unsort_lst):
+    if len(unsort_lst) <= 1:
+        return unsort_lst
+
+    mid = len(unsort_lst) // 2
+    left, right = merge_sort(unsort_lst[:mid]), merge_sort(unsort_lst[mid:])
+
+    merged = []
+    while left and right:
+        if left[0] <= right[0]:
+            merged.append(left.pop(0))
+        else:
+            merged.append(right.pop(0))
+    merged.extend(right if right else left)
+
+    return merged
 
 
 if __name__ == "__main__":

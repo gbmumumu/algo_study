@@ -275,7 +275,7 @@ class BinaryHeap:
         self.perc_down(1)  # 新顶下沉
         return ret_val
 
-    def build_heap(self, lst):   # O(n)
+    def build_heap(self, lst):  # O(n)
         i = len(lst) // 2
         self.cur_size = len(lst)
         self.heap_list = [0] + lst
@@ -283,9 +283,343 @@ class BinaryHeap:
             self.perc_down(i)
             i -= 1
 
+
 # 堆排序 O(n log n)
 # pass
 # 二叉查找树
+# put, get, del, len, in
+# BST:
+# 比父节点小的都出现在左子树，大的都出现在右子树
+class BinarySearchTree:
+    def __init__(self):
+        self.root = None
+        self.size = 0
+
+    def put(self, key, val):
+        if self.root:
+            self._put(key, val, self.root)
+        else:
+            self.root = TreeNode(key, val)
+        self.size = self.size + 1
+
+    def _put(self, key, val, cur_node):
+        if key < cur_node.key:
+            if cur_node.hasLeftChild():
+                self._put(key, val, cur_node.leftChild)
+            else:
+                cur_node.leftChild = TreeNode(key, val, parent=cur_node)
+        else:
+            if cur_node.hasRightChild():
+                self._put(key, val, cur_node.rightChild)
+            else:
+                cur_node.rightChild = TreeNode(key, val, parent=cur_node)
+
+    def __setitem__(self, k, v):
+        self.put(k, v)
+
+    def get(self, key):
+        if self.root:
+            res = self._get(key, self.root)
+            if res:
+                return res.payload
+            else:
+                return None
+        else:
+            return None
+
+    def _get(self, key, cur_node):
+        if not cur_node:
+            return None
+        elif cur_node.key == key:
+            return cur_node
+        elif key < cur_node.key:
+            return self._get(key, cur_node.leftChild)
+        else:
+            return self._get(key, cur_node.rightChild)
+
+    def __getitem__(self, key):
+        res = self.get(key)
+        if res:
+            return res
+        else:
+            raise KeyError('Error, key not in tree')
+
+    def __contains__(self, key):
+        if self._get(key, self.root):
+            return True
+        else:
+            return False
+
+    def length(self):
+        return self.size
+
+    def __len__(self):
+        return self.size
+
+    def __iter__(self):
+        return self.root.__iter__()
+
+    def delete(self, key):
+        if self.size > 1:
+            nodeToRemove = self._get(key, self.root)
+            if nodeToRemove:
+                self.remove(nodeToRemove)
+                self.size = self.size - 1
+            else:
+                raise KeyError('Error, key not in tree')
+        elif self.size == 1 and self.root.key == key:
+            self.root = None
+            self.size = self.size - 1
+        else:
+            raise KeyError('Error, key not in tree')
+
+    def __delitem__(self, key):
+        self.delete(key)
+
+    @staticmethod
+    def remove(cur_node):
+        if cur_node.isLeaf():  # leaf
+            if cur_node == cur_node.parent.leftChild:
+                cur_node.parent.leftChild = None
+            else:
+                cur_node.parent.rightChild = None
+        elif cur_node.hasBothChildren():  # interior
+            succ = cur_node.find_successor()
+            succ.spliceOut()
+            cur_node.key = succ.key
+            cur_node.payload = succ.payload
+        else:  # this node has one child
+            if cur_node.hasLeftChild():
+                if cur_node.isLeftChild():
+                    cur_node.leftChild.parent = cur_node.parent
+                    cur_node.parent.leftChild = cur_node.leftChild
+                elif cur_node.isRightChild():
+                    cur_node.leftChild.parent = cur_node.parent
+                    cur_node.parent.rightChild = cur_node.leftChild
+                else:
+                    cur_node.replaceNodeData(cur_node.leftChild.key,
+                                             cur_node.leftChild.payload,
+                                             cur_node.leftChild.leftChild,
+                                             cur_node.leftChild.rightChild)
+            else:
+                if cur_node.isLeftChild():
+                    cur_node.rightChild.parent = cur_node.parent
+                    cur_node.parent.leftChild = cur_node.rightChild
+                elif cur_node.isRightChild():
+                    cur_node.rightChild.parent = cur_node.parent
+                    cur_node.parent.rightChild = cur_node.rightChild
+                else:
+                    cur_node.replaceNodeData(cur_node.rightChild.key,
+                                             cur_node.rightChild.payload,
+                                             cur_node.rightChild.leftChild,
+                                             cur_node.rightChild.rightChild)
+
+    def inorder(self):
+        self._inorder(self.root)
+
+    def _inorder(self, tree):
+        if tree is not None:
+            self._inorder(tree.leftChild)
+            print(tree.key)
+            self._inorder(tree.rightChild)
+
+    def postorder(self):
+        self._postorder(self.root)
+
+    def _postorder(self, tree):
+        if tree:
+            self._postorder(tree.rightChild)
+            self._postorder(tree.leftChild)
+            print(tree.key)
+
+    def preorder(self):
+        self._preorder(self.root)
+
+    def _preorder(self, tree):
+        if tree:
+            print(tree.key)
+            self._preorder(tree.leftChild)
+            self._preorder(tree.rightChild)
+
+
+class TreeNode:
+    def __init__(self, key, val, left=None, right=None, parent=None):
+        self.key = key
+        self.payload = val
+        self.leftChild = left
+        self.rightChild = right
+        self.parent = parent
+        self.balanceFactor = 0
+
+    def hasLeftChild(self):
+        return self.leftChild
+
+    def hasRightChild(self):
+        return self.rightChild
+
+    def isLeftChild(self):
+        return self.parent and self.parent.leftChild == self
+
+    def isRightChild(self):
+        return self.parent and self.parent.rightChild == self
+
+    def isRoot(self):
+        return not self.parent
+
+    def isLeaf(self):
+        return not (self.rightChild or self.leftChild)
+
+    def hasAnyChildren(self):
+        return self.rightChild or self.leftChild
+
+    def hasBothChildren(self):
+        return self.rightChild and self.leftChild
+
+    def replaceNodeData(self, key, value, lc, rc):
+        self.key = key
+        self.payload = value
+        self.leftChild = lc
+        self.rightChild = rc
+        if self.hasLeftChild():
+            self.leftChild.parent = self
+        if self.hasRightChild():
+            self.rightChild.parent = self
+
+    def find_successor(self):
+        succ = None
+        if self.hasRightChild():
+            succ = self.rightChild.findMin()
+        else:
+            if self.parent:
+                if self.isLeftChild():
+                    succ = self.parent
+                else:
+                    self.parent.rightChild = None
+                    succ = self.parent.find_successor()
+                    self.parent.rightChild = self
+        return succ
+
+    def spliceOut(self):
+        if self.isLeaf():
+            if self.isLeftChild():
+                self.parent.leftChild = None
+            else:
+                self.parent.rightChild = None
+        elif self.hasAnyChildren():
+            if self.hasLeftChild():
+                if self.isLeftChild():
+                    self.parent.leftChild = self.leftChild
+                else:
+                    self.parent.rightChild = self.leftChild
+                self.leftChild.parent = self.parent
+            else:
+                if self.isLeftChild():
+                    self.parent.leftChild = self.rightChild
+                else:
+                    self.parent.rightChild = self.rightChild
+                self.rightChild.parent = self.parent
+
+    def findMin(self):
+        current = self
+        while current.hasLeftChild():
+            current = current.leftChild
+        return current
+
+    def __iter__(self):
+        """The standard inorder traversal of a binary tree."""
+        if self:
+            if self.hasLeftChild():
+                for elem in self.leftChild:
+                    yield elem
+            yield self.key
+            if self.hasRightChild():
+                for elem in self.rightChild:
+                    yield elem
+
+
+# AVL 树
+# AVL ADT Map
+class AVLTree(BinarySearchTree):
+    def _put(self, key, val, cur_node):
+        if key < cur_node.key:
+            if cur_node.hasLeftChild():
+                self._put(key, val, cur_node.leftChild)
+            else:
+                cur_node.leftChild = TreeNode(key, val, parent=cur_node)
+                self.updateBalance(cur_node.leftChild)
+        else:
+            if cur_node.hasRightChild():
+                self._put(key, val, cur_node.rightChild)
+            else:
+                cur_node.rightChild = TreeNode(key, val, parent=cur_node)
+                self.updateBalance(cur_node.rightChild)
+
+    def updateBalance(self, node):
+        if node.balanceFactor > 1 or node.balanceFactor < -1:
+            self.rebalance(node)
+            return
+        if node.parent is not None:
+            if node.isLeftChild():
+                node.parent.balanceFactor += 1
+            elif node.isRightChild():
+                node.parent.balanceFactor -= 1
+
+            if node.parent.balanceFactor != 0:
+                self.updateBalance(node.parent)
+
+    def rebalance(self, node):
+        if node.balanceFactor < 0:
+            if node.rightChild.balanceFactor > 0:
+                # Do an LR Rotation
+                self.rotateRight(node.rightChild)
+                self.rotateLeft(node)
+            else:
+                # single left
+                self.rotateLeft(node)
+        elif node.balanceFactor > 0:
+            if node.leftChild.balanceFactor < 0:
+                # Do an RL Rotation
+                self.rotateLeft(node.leftChild)
+                self.rotateRight(node)
+            else:
+                # single right
+                self.rotateRight(node)
+
+    def rotateLeft(self, rotRoot):
+        newRoot = rotRoot.rightChild
+        rotRoot.rightChild = newRoot.leftChild
+        if newRoot.leftChild is not None:
+            newRoot.leftChild.parent = rotRoot
+        newRoot.parent = rotRoot.parent
+        if rotRoot.isRoot():
+            self.root = newRoot
+        else:
+            if rotRoot.isLeftChild():
+                rotRoot.parent.leftChild = newRoot
+            else:
+                rotRoot.parent.rightChild = newRoot
+        newRoot.leftChild = rotRoot
+        rotRoot.parent = newRoot
+        rotRoot.balanceFactor = rotRoot.balanceFactor + 1 - min(newRoot.balanceFactor, 0)
+        newRoot.balanceFactor = newRoot.balanceFactor + 1 + max(rotRoot.balanceFactor, 0)
+
+    def rotateRight(self, rotRoot):
+        newRoot = rotRoot.leftChild
+        rotRoot.leftChild = newRoot.rightChild
+        if newRoot.rightChild is not None:
+            newRoot.rightChild.parent = rotRoot
+        newRoot.parent = rotRoot.parent
+        if rotRoot.isRoot():
+            self.root = newRoot
+        else:
+            if rotRoot.isRightChild():
+                rotRoot.parent.rightChild = newRoot
+            else:
+                rotRoot.parent.leftChild = newRoot
+        newRoot.rightChild = rotRoot
+        rotRoot.parent = newRoot
+        rotRoot.balanceFactor = rotRoot.balanceFactor - 1 - max(newRoot.balanceFactor, 0)
+        newRoot.balanceFactor = newRoot.balanceFactor - 1 + min(rotRoot.balanceFactor, 0)
 
 
 if __name__ == "__main__":
